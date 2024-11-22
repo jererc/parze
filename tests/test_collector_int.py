@@ -62,8 +62,8 @@ class X1337xTestCase(BaseTestCase):
 
     def test_ok(self):
         self._collect([
-            'https://1337x.to/user/FitGirl/',
-            # 'https://1337x.to/user/DODI/',
+            # 'https://1337x.to/user/FitGirl/',
+            'https://1337x.to/user/DODI/',
             # 'https://1337x.to/sort-search/battlefield%20repack/time/desc/1/',
             # ('https://1337x.to/cat/Movies/1/', 'movies'),
         ])

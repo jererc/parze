@@ -10,7 +10,7 @@ from parze.parsers.base import BaseParser
 
 
 class NvidiaGeforceParser(BaseParser):
-    id = 'nvidia'
+    id = 'nvidia.geforce'
 
     @staticmethod
     def can_parse_url(url):

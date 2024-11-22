@@ -12,7 +12,7 @@ from uuid import uuid4
 from svcutils.service import Notifier, get_file_mtime
 from webutils.browser import get_driver
 
-from parze import NAME, WORK_PATH, logger
+from parze import NAME, logger
 from parze.parsers.base import iterate_parsers
 
 
@@ -50,7 +50,7 @@ class ItemStorage:
     def _get_dst_path(self, url):
         return os.path.join(self.base_path, self._get_dst_dirname(url))
 
-    def _get_dst_filename(self):
+    def _generate_dst_filename(self):
         return f'{uuid4().hex}.json'
 
     def _iterate_file_and_items(self, url):
@@ -82,7 +82,7 @@ class ItemStorage:
 
         dst_path = self._get_dst_path(url)
         makedirs(dst_path)
-        file = os.path.join(dst_path, self._get_dst_filename())
+        file = os.path.join(dst_path, self._generate_dst_filename())
         with open(file, 'w') as fd:
             fd.write(to_json(new_items))
 
@@ -153,15 +153,15 @@ class ItemCollector:
     def _collect_items(self, url_item):
         parsers = list(self._iterate_parsers(url_item))
         if not parsers:
-            raise Exception('no parser')
+            raise Exception('no available parser')
         items = {}
         now = time.time()
         for parser in sorted(parsers, key=lambda x: x.id):
             names = [r for r in parser.parse(url_item.url) if r]
-            logger.debug(f'{parser.id} output:\n'
+            logger.debug(f'{parser.id} results ({url_item.url}):\n'
                 f'{json.dumps(names, indent=4)}')
             if not names:
-                logger.error(f'no result from {parser.id}')
+                logger.error(f'no result from {url_item.url}')
                 Notifier().send(title=f'{NAME} error',
                     body=f'no result from {parser.id}')
                 continue
@@ -180,11 +180,11 @@ class ItemCollector:
 
     def run(self):
         start_ts = time.time()
-        all_urls = set()
+        urls = set()
         try:
             for url in self.config.URLS:
                 url_item = URLItem(url)
-                all_urls.add(url_item.url)
+                urls.add(url_item.url)
                 try:
                     self._process_url_item(url_item)
                 except Exception as exc:
@@ -193,7 +193,7 @@ class ItemCollector:
                         body=f'failed to process {url_item.id}: {exc}')
         finally:
             self.driver.quit()
-        self.item_storage.cleanup(all_urls)
+        self.item_storage.cleanup(urls)
         logger.info(f'processed in {time.time() - start_ts:.02f} seconds')
 
 
