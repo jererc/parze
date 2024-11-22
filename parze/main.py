@@ -4,7 +4,8 @@ import sys
 
 from svcutils.service import Config, Service
 
-from parze.collector import WORK_PATH, collect
+from parze import WORK_PATH
+from parze.collector import collect
 
 
 def parse_args():
