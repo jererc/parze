@@ -15,7 +15,7 @@ def parse_args():
     collect_parser = subparsers.add_parser('collect')
     collect_parser.add_argument('--daemon', action='store_true')
     collect_parser.add_argument('--task', action='store_true')
-    collect_parser.add_argument('--no-headless', action='store_true')
+    collect_parser.add_argument('--interactive', '-i', action='store_true')
     args = parser.parse_args()
     if not args.cmd:
         parser.print_help()
@@ -47,7 +47,7 @@ def main():
         elif args.task:
             service.run_once()
         else:
-            collect(config, headless=not args.no_headless)
+            collect(config, headless=not args.interactive)
 
 
 if __name__ == '__main__':
